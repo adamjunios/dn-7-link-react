@@ -1,5 +1,4 @@
 import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { ReactComponent as IgIcon } from "../assets/icons/ig-fill.svg";
 import { ReactComponent as TwitterIcon } from "../assets/icons/twitter.svg";
 import { ReactComponent as TiktokIcon } from "../assets/icons/tiktok.svg";
@@ -9,6 +8,7 @@ const Footer = () => {
   return (
     <>
       <div className="d-flex justify-content-center align-items-center flex-column footer col-md-12">
+        {/* icon sosmed */}
         <div className="d-flex flex-row justify-content-center space-between">
           <a
             href="https://www.instagram.com/diesnatalispknstan/"
@@ -47,6 +47,7 @@ const Footer = () => {
             </span>
           </a>
         </div>
+        {/* copyright by pbs */}
         &copy; PBS DN VII PKNSTAN
       </div>
     </>
