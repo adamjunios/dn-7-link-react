@@ -209,6 +209,15 @@ a {
   transition: filter 300ms;
   margin-left: auto;
 }
+.icon-right:hover {
+  filter: brightness(1.2);
+}
+
+.icon-right svg {
+  fill: var(--text-color);
+  width: 15px;
+  height: 15px;
+}
 
 /* CSSTransition classes  */
 .menu-primary-enter {

@@ -1,6 +1,7 @@
 import "../index.css";
 import { ReactComponent as ArrowIcon } from "../assets/icons/arrow.svg";
 import { ReactComponent as BoltIcon } from "../assets/icons/bolt.svg";
+import { ReactComponent as RightArrowIcon } from "../assets/icons/right-arrow.svg";
 
 import React, { useState, useEffect, useRef } from "react";
 import { CSSTransition } from "react-transition-group";
@@ -12,6 +13,7 @@ function Dropdown() {
   const [menuHeight, setMenuHeight] = useState(null);
   const dropdownRef = useRef(null);
   const [categoryList, setCategoryList] = useState([]);
+  const [linklv1List, setLinkLv1List] = useState([]);
   const [linkList, setLinkList] = useState([]);
   const [linkName, setLinkName] = useState();
 
@@ -31,6 +33,14 @@ function Dropdown() {
     Axios.get("http://localhost:3001/api/get").then((response) => {
       console.log(response);
       setCategoryList(response.data);
+    });
+  }, []);
+
+  //get link without category (level 1)
+  useEffect(() => {
+    Axios.get("http://localhost:3001/api/get-lv1-link").then((response) => {
+      console.log(response);
+      setLinkLv1List(response.data);
     });
   }, []);
 
@@ -95,8 +105,25 @@ function Dropdown() {
         <div className="menu">
           {categoryList.map((val) => {
             return (
-              <DropdownItem leftIcon={val.icon} goToMenu={val.id} key={val.id}>
+              <DropdownItem
+                leftIcon={val.icon}
+                goToMenu={val.id}
+                key={val.id}
+                rightIcon={<RightArrowIcon />}
+              >
                 <h4>{val.name}</h4>
+              </DropdownItem>
+            );
+          })}
+          {linklv1List.map((val) => {
+            return (
+              <DropdownItem
+                goToMenu="main"
+                leftIcon={<BoltIcon />}
+                key={val.id}
+                goHref={val.link}
+              >
+                {val.name}
               </DropdownItem>
             );
           })}
@@ -115,6 +142,7 @@ function Dropdown() {
           <DropdownItem goToMenu="main" leftIcon={<ArrowIcon />}>
             <h4>Kembali</h4>
           </DropdownItem>
+
           {linkList.map((vallink) => {
             return (
               <DropdownItem

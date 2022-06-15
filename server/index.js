@@ -24,6 +24,7 @@ app.use(express.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//get category (level 1)
 app.get("/api/get", (req, res) => {
   const sqlSelect = "SELECT * FROM categories";
   db.query(sqlSelect, (err, result) => {
@@ -31,6 +32,15 @@ app.get("/api/get", (req, res) => {
   });
 });
 
+//get link without category (level 1)
+app.get("/api/get-lv1-link", (req, res) => {
+  const sqlSelect = "SELECT * FROM links WHERE category_id IS NULL";
+  db.query(sqlSelect, (err, result) => {
+    res.send(result);
+  });
+});
+
+//get link based on category (level 2)
 app.get("/api/getlinks/:linkCategory", (req, res) => {
   const linkCategory = req.params.linkCategory;
   const sqlSelectLinks = "SELECT * FROM links WHERE category_id=?";
