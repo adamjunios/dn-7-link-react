@@ -7,15 +7,23 @@ import React, { useState, useEffect, useRef } from "react";
 import { CSSTransition } from "react-transition-group";
 
 import Axios from "axios";
+import Modal from "./Modal/Modal";
 
 function Dropdown() {
+  //menu state
   const [activeMenu, setActiveMenu] = useState("main");
   const [menuHeight, setMenuHeight] = useState(null);
   const dropdownRef = useRef(null);
+  //fetch data state
   const [categoryList, setCategoryList] = useState([]);
   const [linklv1List, setLinkLv1List] = useState([]);
   const [linkList, setLinkList] = useState([]);
   const [linkName, setLinkName] = useState();
+  //modal state
+  const [show, setShow] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalBody, setModalBody] = useState("");
+  const [modalLink, setModalLink] = useState("");
 
   //set flexible height of dropdown / menu
   useEffect(() => {
@@ -76,6 +84,18 @@ function Dropdown() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  //handle clik to show modal
+  function handleClickLeftIcon(modalTitle, modalBody, modalLink, e) {
+    if (modalLink) {
+      setModalTitle(modalTitle);
+      setModalBody(modalBody);
+      setModalLink(modalLink);
+      setShow(true);
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  }
+
   //per menu-item content
   function DropdownItem(props) {
     return (
@@ -84,7 +104,19 @@ function Dropdown() {
         className="menu-item-custom"
         onClick={() => handleClick(props.goToMenu, props.goHref)}
       >
-        <span className="icon-button-custom">{props.leftIcon}</span>
+        <span
+          className="icon-button-custom"
+          onClick={(e) => {
+            handleClickLeftIcon(
+              props.goToMenu,
+              props.goToMenu,
+              props.goHref,
+              e
+            );
+          }}
+        >
+          {props.leftIcon}
+        </span>
         {props.children}
         <span className="icon-right">{props.rightIcon}</span>
       </a>
@@ -93,70 +125,78 @@ function Dropdown() {
 
   //based content
   return (
-    <div className="dropdown col-md-12">
-      {/* level 1 */}
-      <CSSTransition
-        in={activeMenu === "main"}
-        timeout={500}
-        classNames="menu-primary"
-        unmountOnExit
-        onEnter={calcHeight}
-      >
-        <div className="menu">
-          {categoryList.map((val) => {
-            return (
-              <DropdownItem
-                leftIcon={val.icon}
-                goToMenu={val.id}
-                key={val.id}
-                rightIcon={<RightArrowIcon />}
-              >
-                <h4>{val.name}</h4>
-              </DropdownItem>
-            );
-          })}
-          {linklv1List.map((val) => {
-            return (
-              <DropdownItem
-                goToMenu="main"
-                leftIcon={<BoltIcon />}
-                key={val.id}
-                goHref={val.link}
-              >
-                {val.name}
-              </DropdownItem>
-            );
-          })}
-        </div>
-      </CSSTransition>
+    <>
+      <Modal
+        onClose={() => setShow(false)}
+        show={show}
+        modalTitle={modalTitle}
+        modalBody={modalBody}
+        modalLink={modalLink}
+      />
+      <div className="dropdown col-md-12">
+        {/* level 1 */}
+        <CSSTransition
+          in={activeMenu === "main"}
+          timeout={500}
+          classNames="menu-primary"
+          unmountOnExit
+          onEnter={calcHeight}
+        >
+          <div className="menu">
+            {categoryList.map((val) => {
+              return (
+                <DropdownItem
+                  leftIcon={val.icon}
+                  goToMenu={val.id}
+                  key={val.id}
+                  rightIcon={<RightArrowIcon />}
+                >
+                  <h4>{val.name}</h4>
+                </DropdownItem>
+              );
+            })}
+            {linklv1List.map((val) => {
+              return (
+                <DropdownItem
+                  goToMenu="main"
+                  leftIcon={<BoltIcon />}
+                  key={val.id}
+                  goHref={val.link}
+                >
+                  {val.name}
+                </DropdownItem>
+              );
+            })}
+          </div>
+        </CSSTransition>
+        {/* level 2 */}
+        <CSSTransition
+          in={activeMenu === linkName}
+          timeout={500}
+          classNames="menu-secondary"
+          unmountOnExit
+          onEnter={calcHeight}
+        >
+          <div className="menu">
+            <DropdownItem goToMenu="main" leftIcon={<ArrowIcon />}>
+              <h4>Kembali</h4>
+            </DropdownItem>
 
-      {/* level 2 */}
-      <CSSTransition
-        in={activeMenu === linkName}
-        timeout={500}
-        classNames="menu-secondary"
-        unmountOnExit
-        onEnter={calcHeight}
-      >
-        <div className="menu">
-          <DropdownItem goToMenu="main" leftIcon={<ArrowIcon />}>
-            <h4>Kembali</h4>
-          </DropdownItem>
-
-          {linkList.map((vallink) => {
-            return (
-              <DropdownItem
-                leftIcon={<BoltIcon />}
-                goToMenu={linkName}
-                goHref={vallink.link}
-              >
-                {vallink.name}
-              </DropdownItem>
-            );
-          })}
-        </div>
-      </CSSTransition>
-    </div>
+            {linkList.map((vallink) => {
+              return (
+                <DropdownItem
+                  leftIcon={<BoltIcon />}
+                  goToMenu={linkName}
+                  goHref={vallink.link}
+                >
+                  {vallink.name}
+                </DropdownItem>
+              );
+            })}
+          </div>
+        </CSSTransition>
+      </div>
+    </>
   );
 }
 
