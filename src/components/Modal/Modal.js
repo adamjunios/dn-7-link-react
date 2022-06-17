@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
 import { CSSTransition } from "react-transition-group";
+import { ReactComponent as RightArrowIcon } from "../../assets/icons/right-arrow.svg";
+
 import "../../index.css";
 import "./modal.css";
+import PosterContoh from "../../assets/modal/story-otw2.png";
 
 const Modal = (props) => {
   //set close by state
@@ -27,23 +30,26 @@ const Modal = (props) => {
       unmountOnExit
       timeout={{ enter: 500, exit: 500 }}
     >
-      <div className="modal" onClick={props.onClose}>
+      <div className="modal " onClick={props.onClose}>
         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-          <div className="modal-header">
-            <div className="modal-title">{props.modalTitle}</div>
-            <div className="button-close" onClick={props.onClose}>
-              Close
-            </div>
+          <div className="modal-header ">
+            <div className="modal-title ">{props.modalTitle}</div>
+            <div className="button-close" onClick={props.onClose}></div>
           </div>
-          <div className="modal-body">{props.modalBody}</div>
-          <div className="modal-footer">
+          <div className="modal-body ">
+            <img src={PosterContoh} alt={props.modalBody}></img>
+          </div>
+          <div className="modal-footer ">
             <a
               href={props.modalLink}
               className="button-next"
               target="_blank"
               rel="noreferrer"
             >
-              Daftar
+              Buka Link{" "}
+              <span className="icon-right">
+                <RightArrowIcon />
+              </span>
             </a>
           </div>
         </div>
