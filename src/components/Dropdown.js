@@ -3,7 +3,7 @@ import { CSSTransition } from "react-transition-group";
 import Axios from "axios";
 
 import { ReactComponent as ArrowIcon } from "../assets/icons/arrow.svg";
-import { ReactComponent as BoltIcon } from "../assets/icons/bolt.svg";
+import { ReactComponent as AboutIcon } from "../assets/icons/about.svg";
 import { ReactComponent as RightArrowIcon } from "../assets/icons/right-arrow.svg";
 
 import "../index.css";
@@ -180,7 +180,7 @@ function Dropdown() {
               return (
                 <DropdownItem
                   goToMenu="main"
-                  leftIcon={<BoltIcon />}
+                  leftIcon={<AboutIcon />}
                   key={val.id}
                   goHref={val.link}
                   goLinkName={val.name}
@@ -212,7 +212,7 @@ function Dropdown() {
             {linkList.map((vallink) => {
               return (
                 <DropdownItem
-                  leftIcon={<BoltIcon />}
+                  leftIcon={<AboutIcon />}
                   goToMenu={idLink}
                   goHref={vallink.link}
                   goLinkName={vallink.name}
