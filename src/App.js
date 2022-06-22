@@ -8,7 +8,7 @@ import Footer from "./components/Footer";
 function App() {
   return (
     <>
-      <div className="col-md-4 d-flex justify-content-center align-items-center flex-column m-auto">
+      <div className="col-md-4 d-flex justify-content-center align-items-center flex-column m-auto container">
         <Header />
         <Dropdown />
         <Footer />

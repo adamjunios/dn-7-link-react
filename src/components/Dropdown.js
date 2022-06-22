@@ -11,6 +11,9 @@ import PosterContoh from "../assets/modal/story-otw2.png";
 
 import Modal from "./Modal/Modal";
 
+import { db } from "./firebase/FirebaseConfig";
+import { collection, getDocs, query, where } from "firebase/firestore";
+
 function Dropdown() {
   //menu state
   const [activeMenu, setActiveMenu] = useState("main");
@@ -21,12 +24,16 @@ function Dropdown() {
   const [categoryName, setCategoryName] = useState("main");
   const [linklv1List, setLinkLv1List] = useState([]);
   const [linkList, setLinkList] = useState([]);
-  const [idLink, setidLink] = useState();
+  const [idCategory, setidCategory] = useState(["KosdxGtnJpnDxM82xb5f"]);
   //modal state
   const [show, setShow] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalBody, setModalBody] = useState("");
   const [modalLink, setModalLink] = useState("");
+
+  //connect to db
+  const categoriesCollectionRef = collection(db, "categories");
+  const linksCollectionRef = collection(db, "links");
 
   //set flexible height of dropdown / menu
   useEffect(() => {
@@ -41,10 +48,20 @@ function Dropdown() {
 
   //get category (level 1)
   useEffect(() => {
-    Axios.get("http://localhost:3001/api/get").then((response) => {
-      console.log(response);
-      setCategoryList(response.data);
-    });
+    //using firebase
+    const getCategories = async () => {
+      const dataCategories = await getDocs(categoriesCollectionRef);
+      setCategoryList(
+        dataCategories.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+      );
+    };
+    getCategories();
+
+    // using API
+    // Axios.get("http://localhost:3001/api/get").then((response) => {
+    //   console.log(response);
+    //   setCategoryList(response.data);
+    // });
   }, []);
 
   //get link without category (level 1)
@@ -57,34 +74,47 @@ function Dropdown() {
 
   //get links based on category (level 2)
   useEffect(() => {
-    Axios.get(`http://localhost:3001/api/getlinks/${idLink}`).then(
-      (response) => {
-        console.log(response);
-        setLinkList(response.data);
-      }
-    );
-  }, [idLink]);
+    //using firebase
+    const getLinks = async () => {
+      const dataLinks = await getDocs(
+        linksCollectionRef.where("category_id", "==", "KosdxGtnJpnDxM82xb5f")
+      );
+      console.log(dataLinks);
+      setLinkList(dataLinks.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    };
+    getLinks();
+
+    // using API
+    // Axios.get(`http://localhost:3001/api/getlinks/${idCategory}`).then(
+    //   (response) => {
+    //     console.log(response);
+    //     setLinkList(response.data);
+    //   }
+    // );
+  }, []);
 
   //handle clik onclick menu category and links
-  function handleClick(idLink, linkCategoryName, linkHref) {
-    console.log(`You clicked ${idLink} ${linkCategoryName}`);
-    setidLink(idLink);
+  function handleClick(e, idCategory, linkCategoryName, linkHref) {
+    console.log(`You clicked ${idCategory} ${linkCategoryName}`);
+    setidCategory(idCategory);
 
-    if (idLink === "main" || idLink === "") {
+    if (idCategory === "main" || idCategory === "") {
+      e.preventDefault();
       handleClickMain();
     } else {
-      setActiveMenu(idLink);
+      e.preventDefault();
+      setActiveMenu(idCategory);
       setCategoryName(linkCategoryName);
     }
 
     //on click links
-    linkHref ? openInNewTab(linkHref) : setActiveMenu(idLink);
+    linkHref ? openInNewTab(linkHref) : setActiveMenu(idCategory);
   }
 
   //handle click on menu back
   function handleClickMain() {
     setActiveMenu("main");
-    setidLink("");
+    setidCategory("");
     setCategoryName("main");
   }
 
@@ -119,9 +149,9 @@ function Dropdown() {
       <a
         href="#"
         className="menu-item-custom"
-        onClick={() =>
-          handleClick(props.goToMenu, props.goCategoryName, props.goHref)
-        }
+        onClick={(e) => {
+          handleClick(e, props.goToMenu, props.goCategoryName, props.goHref);
+        }}
       >
         <span
           className="icon-button-custom"
@@ -182,7 +212,7 @@ function Dropdown() {
                   goToMenu="main"
                   leftIcon={<AboutIcon />}
                   key={val.id}
-                  goHref={val.link}
+                  goHref={val.links}
                   goLinkName={val.name}
                   goCategoryName={categoryName}
                 >
@@ -194,7 +224,7 @@ function Dropdown() {
         </CSSTransition>
         {/* level 2 */}
         <CSSTransition
-          in={activeMenu === idLink}
+          in={activeMenu === idCategory}
           timeout={500}
           classNames="menu-secondary"
           unmountOnExit
@@ -213,8 +243,8 @@ function Dropdown() {
               return (
                 <DropdownItem
                   leftIcon={<AboutIcon />}
-                  goToMenu={idLink}
-                  goHref={vallink.link}
+                  goToMenu={idCategory}
+                  goHref={vallink.links}
                   goLinkName={vallink.name}
                   goCategoryName={categoryName}
                 >

@@ -21,6 +21,11 @@ body {
   font-family: "Enchanted";
   src: url("./assets/font/EnchantedLand.otf");
 }
+
+.container {
+  min-height: 100vh;
+}
+
 .title-abs {
   font-family: "Enchanted";
   letter-spacing: 0.15rem;
@@ -130,6 +135,7 @@ a {
 /* Dropdown Menu */
 
 .dropdown {
+  width: 100%;
   position: absolute;
   padding: 1rem;
   overflow: hidden;
