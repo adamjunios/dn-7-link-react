@@ -12,7 +12,14 @@ import PosterContoh from "../assets/modal/story-otw2.png";
 import Modal from "./Modal/Modal";
 
 import { db } from "./firebase/FirebaseConfig";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  query,
+  where,
+} from "firebase/firestore";
 
 function Dropdown() {
   //menu state
@@ -24,7 +31,7 @@ function Dropdown() {
   const [categoryName, setCategoryName] = useState("main");
   const [linklv1List, setLinkLv1List] = useState([]);
   const [linkList, setLinkList] = useState([]);
-  const [idCategory, setidCategory] = useState(["KosdxGtnJpnDxM82xb5f"]);
+  const [activeIdCategory, setActiveIdCategory] = useState([]);
   //modal state
   const [show, setShow] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -66,21 +73,39 @@ function Dropdown() {
 
   //get link without category (level 1)
   useEffect(() => {
-    Axios.get("http://localhost:3001/api/get-lv1-link").then((response) => {
-      console.log(response);
-      setLinkLv1List(response.data);
-    });
+    // use Firebase
+    const getLinkLv1 = async () => {
+      const q = query(
+        collection(db, "links"),
+        where("category_id", "==", null)
+      );
+
+      const querySnapshot = await getDocs(q);
+      setLinkLv1List(
+        querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+      );
+    };
+    getLinkLv1();
+
+    // use API
+    // Axios.get("http://localhost:3001/api/get-lv1-link").then((response) => {
+    //   console.log(response);
+    //   setLinkLv1List(response.data);
+    // });
   }, []);
 
   //get links based on category (level 2)
   useEffect(() => {
-    //using firebase
+    // use Firebase
     const getLinks = async () => {
-      const dataLinks = await getDocs(
-        linksCollectionRef.where("category_id", "==", "KosdxGtnJpnDxM82xb5f")
+      const q = query(
+        collection(db, "links"),
+        where("category_id", "==", activeMenu)
       );
-      console.log(dataLinks);
-      setLinkList(dataLinks.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      const querySnapshotLinks = await getDocs(q);
+      setLinkList(
+        querySnapshotLinks.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+      );
     };
     getLinks();
 
@@ -91,22 +116,23 @@ function Dropdown() {
     //     setLinkList(response.data);
     //   }
     // );
-  }, []);
+  }, [activeMenu]);
 
   //handle clik onclick menu category and links
   function handleClick(e, idCategory, linkCategoryName, linkHref) {
     console.log(`You clicked ${idCategory} ${linkCategoryName}`);
-    setidCategory(idCategory);
 
     if (idCategory === "main" || idCategory === "") {
       e.preventDefault();
       handleClickMain();
     } else {
-      e.preventDefault();
       setActiveMenu(idCategory);
+      setActiveIdCategory(idCategory);
+      e.preventDefault();
       setCategoryName(linkCategoryName);
     }
 
+    console.log(`Active Id Cate ${activeIdCategory}`);
     //on click links
     linkHref ? openInNewTab(linkHref) : setActiveMenu(idCategory);
   }
@@ -114,7 +140,7 @@ function Dropdown() {
   //handle click on menu back
   function handleClickMain() {
     setActiveMenu("main");
-    setidCategory("");
+    setActiveIdCategory("");
     setCategoryName("main");
   }
 
@@ -224,7 +250,7 @@ function Dropdown() {
         </CSSTransition>
         {/* level 2 */}
         <CSSTransition
-          in={activeMenu === idCategory}
+          in={activeMenu === activeIdCategory}
           timeout={500}
           classNames="menu-secondary"
           unmountOnExit
@@ -243,7 +269,7 @@ function Dropdown() {
               return (
                 <DropdownItem
                   leftIcon={<AboutIcon />}
-                  goToMenu={idCategory}
+                  goToMenu={activeIdCategory}
                   goHref={vallink.links}
                   goLinkName={vallink.name}
                   goCategoryName={categoryName}
